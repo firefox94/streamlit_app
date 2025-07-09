@@ -5,7 +5,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_ollama.llms import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, AIMessage
-from langchain_chroma import Chroma
+from langchain_community.vectorstores import FAISS
 import streamlit as st
 from dotenv import load_dotenv
 
@@ -34,14 +34,10 @@ embeddings = OllamaEmbeddings(model="mxbai-embed-large")
 
 #3. create chroma db to store your document
 db_location = "./chroma_db" # location where you wanna store your db
-vector_store = Chroma(
-    collection_name="your-document",
-    persist_directory=db_location,
-    embedding_function=embeddings
-)
+vector_store = FAISS.from_documents(documents, embeddings)
 
 #4. store document in vector store and keep renewing your db whenever you run this app
-vector_store.add_documents(documents)
+# vector_store.add_documents(documents)
 
 #5. create retriever
 retriever = vector_store.as_retriever(search_kwargs={"k": 5}) # set k base on how many docs to return
